@@ -1,0 +1,13 @@
+{
+	"exports": {
+		"./base.json": "./base.json"
+	},
+	"license": "UNLICENSED",
+	"name": "@repo/typescript-config",
+	"private": true,
+	"scripts": {
+		"format": "biome check --fix --unsafe .",
+		"lint": "biome check ."
+	},
+	"version": "1.0.0"
+}

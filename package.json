@@ -5,16 +5,16 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
+    "format": "turbo run format",
+    "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
-    "prettier": "^3.7.4",
+    "@biomejs/biome": "^2.3.14",
     "turbo": "^2.8.3",
     "typescript": "5.9.2"
   },
-  "packageManager": "pnpm@9.0.0",
+  "packageManager": "pnpm@10.28.2",
   "engines": {
-    "node": ">=18"
+    "node": "24.13.0"
   }
 }

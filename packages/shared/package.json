@@ -1,0 +1,31 @@
+{
+  "dependencies": {},
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@repo/tsup-config": "workspace:*",
+    "@types/node": "^24.0.0"
+  },
+  "exports": {
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/esm/*.js",
+      "require": "./dist/*.js"
+    }
+  },
+  "license": "UNLICENSED",
+  "name": "@repo/shared",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm run \"/^dev:/\"",
+    "dev:tsup": "tsup --watch",
+    "dev:tsc": "tsc --watch",
+    "build": "pnpm run build:tsup && pnpm run build:tsc",
+    "build:tsup": "tsup --clean",
+    "build:tsc": "tsc",
+    "lint": "biome check .",
+    "format": "biome check --fix --unsafe .",
+    "typecheck": "tsc --noEmit"
+  },
+  "type": "module",
+  "version": "1.0.0"
+}
