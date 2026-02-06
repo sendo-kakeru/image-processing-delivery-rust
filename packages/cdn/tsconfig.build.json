@@ -1,0 +1,11 @@
+{
+	"exclude": [
+		"**/*.test.ts",
+		"**/*.spec.ts",
+		"src/test/**",
+		"**/__tests__/**",
+		"**/__mocks__/**"
+	],
+	"extends": "./tsconfig.json",
+	"include": ["src", "worker-configuration.d.ts"]
+}
