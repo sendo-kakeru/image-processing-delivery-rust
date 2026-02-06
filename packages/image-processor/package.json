@@ -1,0 +1,13 @@
+{
+	"dependencies": {},
+	"devDependencies": {},
+	"license": "UNLICENSED",
+	"name": "@repo/image-processor",
+	"private": true,
+	"scripts": {
+		"build": "cargo build --release",
+		"dev": "cargo run"
+	},
+	"type": "module",
+	"version": "1.0.0"
+}
