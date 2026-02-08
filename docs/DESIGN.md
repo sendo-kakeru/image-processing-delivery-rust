@@ -51,20 +51,31 @@ sequenceDiagram
 
 ベースドメイン: `sendo-app.com`
 
-| サブドメイン            | コンポーネント        | ホスティング       | 用途                                   |
-| ----------------------- | --------------------- | ------------------ | -------------------------------------- |
-| `image.sendo-app.com`     | Edge (CDN/Cache)      | Cloudflare Workers | 画像配信・アップロードの公開エンドポイント |
-| `client.sendo-app.com`  | Client (動作確認)     | Cloudflare Workers | React クライアント (動作確認用 UI)      |
+#### 本番環境 (prod)
+
+| サブドメイン           | コンポーネント    | ホスティング       | 用途                                       |
+| ---------------------- | ----------------- | ------------------ | ------------------------------------------ |
+| `image.sendo-app.com`  | Edge (CDN/Cache)  | Cloudflare Workers | 画像配信・アップロードの公開エンドポイント |
+| `client.sendo-app.com` | Client (動作確認) | Cloudflare Workers | React クライアント (動作確認用 UI)         |
+
+#### STG 環境 (stg)
+
+| サブドメイン               | コンポーネント    | ホスティング       | 用途             |
+| -------------------------- | ----------------- | ------------------ | ---------------- |
+| `stg-image.sendo-app.com`  | Edge (CDN/Cache)  | Cloudflare Workers | STG 画像配信     |
+| `stg-client.sendo-app.com` | Client (動作確認) | Cloudflare Workers | STG クライアント |
 
 - **Cloud Run**: カスタムドメイン不要。デフォルトの `.run.app` ドメインを使用（Workers からの内部アクセスのみ）
 - **R2**: パブリックアクセス不要。S3 互換 API 経由で Cloud Run からのみアクセス
 
 #### DNS レコード
 
-| レコード | ホスト    | 値                           | プロキシ |
-| -------- | --------- | ---------------------------- | -------- |
-| CNAME    | `img`     | Workers カスタムドメイン設定 | ON (橙)  |
-| CNAME    | `client`  | Workers カスタムドメイン設定 | ON (橙)  |
+| レコード | ホスト       | 環境 | 値                           | プロキシ |
+| -------- | ------------ | ---- | ---------------------------- | -------- |
+| CNAME    | `image`      | prod | Workers カスタムドメイン設定 | ON (橙)  |
+| CNAME    | `client`     | prod | Workers カスタムドメイン設定 | ON (橙)  |
+| CNAME    | `stg-image`  | stg  | Workers カスタムドメイン設定 | ON (橙)  |
+| CNAME    | `stg-client` | stg  | Workers カスタムドメイン設定 | ON (橙)  |
 
 #### キャッシュキー URL
 
@@ -343,3 +354,80 @@ CMD ["image-processor"]
 - 対応フォーマット: JPEG, PNG, WebP, AVIF
 - 変換時に EXIF / XMP 等のメタデータを常に削除（GPS 情報などの漏洩防止）
 - Cloud Run のメモリは 512MB〜1GiB を想定
+
+---
+
+## 11. 環境分離
+
+### 11.1 環境一覧
+
+| 環境 | 用途                                 | Pulumi スタック |
+| ---- | ------------------------------------ | --------------- |
+| stg  | 開発・テスト用。本番デプロイ前の検証 | `stg`           |
+| prod | 本番環境                             | `prod`          |
+
+### 11.2 リソース命名規則
+
+すべてのクラウドリソースに環境名をサフィックスとして付与する。
+
+```
+{ベース名}-{env}
+```
+
+| リソース          | STG                    | Prod                    |
+| ----------------- | ---------------------- | ----------------------- |
+| R2 バケット       | `image-store-stg`      | `image-store-prod`      |
+| Artifact Registry | `image-processor-stg`  | `image-processor-prod`  |
+| Cloud Run         | `image-processor-stg`  | `image-processor-prod`  |
+| Workers (CDN)     | `cdn-stg`              | `cdn-prod`              |
+
+### 11.3 Pulumi スタック構成
+
+環境の分離には Pulumi のスタック機能を使用する。
+
+- `pulumi.getStack()` でスタック名 (`stg` / `prod`) を取得
+- リソース名・バケット名にスタック名をサフィックスとして付与
+- 各スタックの設定値 (`Pulumi.stg.yaml`, `Pulumi.prod.yaml`) で環境固有の値を管理
+
+```
+packages/infra/
+├── Pulumi.yaml          # プロジェクト定義 (共通)
+├── Pulumi.stg.yaml      # STG スタック設定 (secrets 含む)
+├── Pulumi.prod.yaml     # Prod スタック設定 (secrets 含む)
+└── index.ts             # スタック名に応じてリソースを作成
+```
+
+### 11.4 Workers 環境分離
+
+Wrangler の `env` セクションで環境を分離する。
+
+```
+wrangler deploy --env stg   # STG デプロイ
+wrangler deploy --env prod  # Prod デプロイ
+```
+
+### 11.5 ドメイン命名規則
+
+- **本番**: `{service}.sendo-app.com` (例: `image.sendo-app.com`)
+- **STG**: `stg-{service}.sendo-app.com` (例: `stg-image.sendo-app.com`)
+
+### 11.6 デプロイ戦略
+
+インフラ構築とアプリデプロイを分離する。
+
+| 責務 | ツール | タイミング |
+| --- | --- | --- |
+| インフラ構築 (AR, Cloud Run サービス定義, R2, IAM) | `pulumi up` | インフラ変更時のみ |
+| アプリデプロイ (新イメージの反映) | `gcloud run deploy` | CI (ブランチマージ時) |
+| Workers デプロイ | `wrangler deploy --env {env}` | CI (ブランチマージ時) |
+
+- Pulumi はサービスの初期作成と設定変更（メモリ、環境変数、IAM 等）を管理
+- コンテナイメージの更新は `gcloud run deploy` で行い、Pulumi は `ignoreChanges` でイメージフィールドを無視
+- CI では git SHA をイメージタグに使用し、デプロイの追跡性を確保
+
+```bash
+# CI でのアプリデプロイ例
+gcloud run deploy image-processor-stg \
+  --image asia-northeast1-docker.pkg.dev/$PROJECT/image-processor-stg/image-processor:$GIT_SHA \
+  --region asia-northeast1
+```
