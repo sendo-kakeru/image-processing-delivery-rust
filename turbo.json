@@ -8,6 +8,7 @@
 		},
 		"format": {},
 		"lint": {},
+		"cf-typegen": {},
 		"infra:up": {},
 		"infra:destroy": {},
 		"typecheck": {
