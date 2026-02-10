@@ -8,10 +8,12 @@
 		"format": "turbo run format",
 		"infra:up": "turbo run infra:up",
 		"infra:destroy": "turbo run infra:destroy",
+		"cf-typegen": "turbo run cf-typegen",
 		"typecheck": "turbo run typecheck"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.14",
+		"tsup": "^8.5.1",
 		"turbo": "^2.8.3",
 		"typescript": "5.9.3"
 	},

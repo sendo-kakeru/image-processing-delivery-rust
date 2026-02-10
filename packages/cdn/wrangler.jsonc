@@ -3,6 +3,16 @@
 	"name": "cdn",
 	"main": "src/index.ts",
 	"compatibility_date": "2026-02-06",
+	"vars": {
+		"ORIGIN_URL": "http://localhost:8080"
+	},
+	"r2_buckets": [
+		{
+			"binding": "IMAGE_STORE",
+			"remote": true,
+			"bucket_name": "image-store-dev"
+		}
+	],
 	"observability": {
 		"enabled": true
 	},
