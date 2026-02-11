@@ -36,9 +36,7 @@
 		},
 		"prod": {
 			"name": "cdn-prod",
-			"routes": [
-				{ "custom_domain": true, "pattern": "image.sendo-app.com" }
-			],
+			"routes": [{ "custom_domain": true, "pattern": "image.sendo-app.com" }],
 			"vars": {
 				"ORIGIN_URL": "https://image-processor-prod-<hash>.a.run.app",
 				"CLIENT_URL": "https://client.sendo-app.com"
