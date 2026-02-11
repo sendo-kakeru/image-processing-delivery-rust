@@ -1,0 +1,31 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "client",
+	"compatibility_flags": ["nodejs_compat"],
+	"compatibility_date": "2026-02-06",
+	"main": "./workers/app.ts",
+	"observability": {
+		"enabled": true
+	},
+	"vars": {
+		"CDN_URL": "http://localhost:8787"
+	},
+	"env": {
+		"staging": {
+			"name": "client-stg",
+			"routes": [
+				{ "custom_domain": true, "pattern": "stg-client.sendo-app.com" }
+			],
+			"vars": {
+				"CDN_URL": "https://stg-image.sendo-app.com"
+			}
+		},
+		"production": {
+			"name": "client-prod",
+			"routes": [{ "custom_domain": true, "pattern": "client.sendo-app.com" }],
+			"vars": {
+				"CDN_URL": "https://image.sendo-app.com"
+			}
+		}
+	}
+}

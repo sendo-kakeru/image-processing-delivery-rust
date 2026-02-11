@@ -1,5 +1,5 @@
-# Stage 1: Build
-FROM rust:1.93-slim AS builder
+# Stage 1: Build (bookworm = Debian 12, distroless/cc-debian12 と glibc を合わせる)
+FROM rust:1.93-slim-bookworm AS builder
 
 WORKDIR /app
 
