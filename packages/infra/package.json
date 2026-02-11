@@ -4,7 +4,7 @@
 	"devDependencies": {
 		"@pulumi/cloudflare": "^6.13.0",
 		"@pulumi/gcp": "^9.0.0",
-		"@pulumi/pulumi": "^3.113.0",
+		"@pulumi/pulumi": "^3.220.0",
 		"@repo/typescript-config": "workspace:*",
 		"@types/node": "^24.0.0",
 		"typescript": "^5.9.3",
