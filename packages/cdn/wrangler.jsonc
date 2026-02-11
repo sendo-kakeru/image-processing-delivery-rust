@@ -24,7 +24,7 @@
 				{ "custom_domain": true, "pattern": "stg-image.sendo-app.com" }
 			],
 			"vars": {
-				"ORIGIN_URL": "https://image-processor-stg-<hash>.a.run.app",
+				"ORIGIN_URL": "https://image-processor-stg-410748120979.asia-northeast1.run.app",
 				"CLIENT_URL": "https://stg-client.sendo-app.com"
 			},
 			"r2_buckets": [
