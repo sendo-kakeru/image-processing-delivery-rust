@@ -11,7 +11,7 @@ jobs:
     environment: production
     timeout-minutes: 60
     env:
-      CLOUDFLARE_ENV: production    
+      CLOUDFLARE_ENV: production
     steps:
       - uses: actions/checkout@v6
 
